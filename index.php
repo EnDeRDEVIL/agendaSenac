@@ -1,12 +1,25 @@
 <?php
     include 'classes/contacts.class.php';
+    include 'classes/user.class.php';
+
+    session_start();
+
+    if(!isset($_SESSION['logged']))
+    {
+        header("Location: login.php");
+        exit;
+    }
+
+    $user = new User();
+    $user->setUser($_SESSION['logged']);
     $contato = new Contacts();
 ?>
 
     <h1>Agenda Senac</h1>
     <hr>
 
-    <button><a href="addContacts.php">ADICIONAR</a></button>
+    <?php if($user->havePermission('add')): ?><button><a href="addContacts.php">ADICIONAR</a></button><?php endif ?><br><br>
+    <button><a href="exit.php">SAIR</a></button>
     
 
     <br><br><br>
@@ -46,8 +59,8 @@
                 <td><?php echo $item['profissao']; ?></td>
                 <td><?php echo $item['foto']; ?></td>
                 <td>
-                    <a href="editContacts.php?id_contatos=<?php echo $item['id_contatos']?>"><button>EDITAR</button></a>
-                    <a href="excludeContacts.php?id_contatos=<?php echo $item['id_contatos']?> " onClick = "return confirm ('Tem certeza que deseja excluir este contato?')"><button>EXCLUIR</button></a>
+                    <?php if($user->havePermission('edit')): ?><a href="editContacts.php?id_contatos=<?php echo $item['id_contatos']?>">EDITAR</a><?php endif ?>
+                    <?php if($user->havePermission('del')): ?><a href="deleteContacts.php?id_contatos=<?php echo $item['id_contatos']?>">EXCLUIR</a><?php endif ?>
                 </td>
             </tr>
         </tbody>
